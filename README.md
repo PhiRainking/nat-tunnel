@@ -14,10 +14,14 @@
 
 ## 快速开始
 
-### 1. 部署服务端（Ubuntu）
+### 1. 部署服务端（Linux）
 
 ```bash
+# 国内
 curl -sSL https://8.134.147.15:8888/down/UymNPEIDwxve.sh | sudo bash
+
+# 国外
+curl -sSL https://raw.githubusercontent.com/PhiRainking/nat-tunnel/main/server/install.sh | sudo bash
 ```
 
 自定义参数：
