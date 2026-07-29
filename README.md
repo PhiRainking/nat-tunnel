@@ -28,7 +28,7 @@ PORT=7000 ADMIN_PORT=9000 TOKEN=*** ADMIN_PWD=*** sudo bash install.sh
 
 ### 2. 安装客户端（Windows）
 
-下载 [NatTunnel-Setup.exe](https://github.com/PhiRainking2/nat-tunnel/releases/latest) 安装包，按向导完成安装。
+下载 [NatTunnel-Setup.exe](https://github.com/PhiRainking/nat-tunnel/releases/download/v1.2.0/NatTunnel-Setup.exe) 安装包，按向导完成安装。
 
 打开 NatTunnel，填写：
 
