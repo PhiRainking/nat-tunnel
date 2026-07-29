@@ -1,6 +1,7 @@
 #!/bin/bash
 # ============================================
-#  NatTunnel Server 一键安装脚本 v1.1
+#  NatTunnel Server 一键安装脚本 v1.2
+#  支持: Ubuntu / Debian / CentOS / RHEL / Fedora / Arch / Alpine
 #  用法: curl -sSL <url> | sudo bash
 #  自定义: PORT=7000 ADMIN_PORT=9000 TOKEN=xxx ADMIN_PWD=xxx sudo bash install.sh
 # ============================================
@@ -8,6 +9,29 @@ set -e
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'; NC='\033[0m'
 log()  { echo -e "${GREEN}[+]${NC} $1"; }
+
+# ---------- 检测系统 ----------
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  OS=$ID
+  OS_LIKE="${ID_LIKE:-$ID}"
+else
+  OS="unknown"
+fi
+
+PKG_MGR=""
+case "$OS" in
+  ubuntu|debian)           PKG_MGR="apt-get"; INSTALL_CMD="apt-get install -y" ;;
+  centos|rhel|fedora|rocky|almalinux|ol)
+    if command -v dnf &>/dev/null; then PKG_MGR="dnf"; INSTALL_CMD="dnf install -y"
+    else PKG_MGR="yum"; INSTALL_CMD="yum install -y"; fi ;;
+  arch|manjaro)            PKG_MGR="pacman"; INSTALL_CMD="pacman -S --noconfirm" ;;
+  alpine)                  PKG_MGR="apk"; INSTALL_CMD="apk add --no-cache" ;;
+  opensuse*|sles)          PKG_MGR="zypper"; INSTALL_CMD="zypper install -y" ;;
+  *)                       PKG_MGR="unknown" ;;
+esac
+
+log "检测到系统: $OS ($PKG_MGR)"
 
 # ---------- 配置 ----------
 CONTROL_PORT=${PORT:-7000}
@@ -18,7 +42,8 @@ APP_DIR="/opt/nat-tunnel-server"
 
 echo -e "${CYAN}"
 echo "  ╔══════════════════════════════════════╗"
-echo "  ║   NatTunnel Server v1.1 一键安装     ║"
+echo "  ║   NatTunnel Server v1.2 一键安装     ║"
+echo "  ║   支持 Ubuntu/Debian/CentOS/Arch...  ║"
 echo "  ╚══════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -27,8 +52,26 @@ if command -v node &>/dev/null; then
   log "Node.js $(node -v) 已安装"
 else
   log "安装 Node.js 20.x..."
-  curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-  apt-get install -y nodejs
+  case "$PKG_MGR" in
+    apt-get)
+      curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      apt-get install -y nodejs ;;
+    dnf|yum)
+      curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+      $INSTALL_CMD nodejs ;;
+    pacman)
+      pacman -S --noconfirm nodejs npm ;;
+    apk)
+      apk add --no-cache nodejs npm ;;
+    zypper)
+      zypper --non-interactive install nodejs20 || zypper --non-interactive install nodejs ;;
+    *)
+      log "未知包管理器，尝试使用 nvm 安装 Node.js..."
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+      export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+      nvm install 20
+      ;;
+  esac
   log "Node.js $(node -v) 安装完成"
 fi
 
@@ -632,11 +675,30 @@ systemctl enable nat-tunnel
 systemctl restart nat-tunnel
 
 # ---------- 防火墙 ----------
-if command -v ufw &>/dev/null; then
-  log "配置防火墙..."
+if command -v ufw &>/dev/null && ufw status 2>/dev/null | grep -q "active"; then
+  log "配置 ufw 防火墙..."
   ufw allow ${CONTROL_PORT}/tcp 2>/dev/null || true
   ufw allow ${ADMIN_PORT}/tcp 2>/dev/null || true
   ufw allow 10000:20000/tcp 2>/dev/null || true
+  ufw allow 10000:20000/udp 2>/dev/null || true
+elif command -v firewall-cmd &>/dev/null && systemctl is-active firewalld &>/dev/null; then
+  log "配置 firewalld 防火墙..."
+  firewall-cmd --permanent --add-port=${CONTROL_PORT}/tcp 2>/dev/null || true
+  firewall-cmd --permanent --add-port=${ADMIN_PORT}/tcp 2>/dev/null || true
+  firewall-cmd --permanent --add-port=10000-20000/tcp 2>/dev/null || true
+  firewall-cmd --permanent --add-port=10000-20000/udp 2>/dev/null || true
+  firewall-cmd --reload 2>/dev/null || true
+elif command -v iptables &>/dev/null; then
+  log "配置 iptables 防火墙..."
+  iptables -I INPUT -p tcp --dport ${CONTROL_PORT} -j ACCEPT 2>/dev/null || true
+  iptables -I INPUT -p tcp --dport ${ADMIN_PORT} -j ACCEPT 2>/dev/null || true
+  iptables -I INPUT -p tcp --dport 10000:20000 -j ACCEPT 2>/dev/null || true
+  iptables -I INPUT -p udp --dport 10000:20000 -j ACCEPT 2>/dev/null || true
+  if command -v iptables-save &>/dev/null; then
+    iptables-save > /etc/iptables/rules.v4 2>/dev/null || true
+  fi
+else
+  log "未检测到防火墙，请手动开放端口: ${CONTROL_PORT}, ${ADMIN_PORT}, 10000-20000"
 fi
 
 # ---------- 卸载脚本 ----------
