@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NatTunnel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部 -->
+    <header class="header">
+      <h1>NatTunnel</h1>
+      <span class="subtitle">内网穿透</span>
+      <span id="statusBadge" class="badge disconnected">未连接</span>
+    </header>
+
+    <!-- 服务器连接 -->
+    <section class="card">
+      <div class="card-title">服务器</div>
+      <div class="form-row">
+        <input id="serverHost" type="text" placeholder="服务器地址" value="">
+        <span class="sep">:</span>
+        <input id="serverPort" type="number" placeholder="7000" value="7000" style="width:80px">
+      </div>
+      <div class="form-row" style="margin-top:8px">
+        <input id="authToken" type="password" placeholder="认证令牌" value="rainking-tunnel-2024">
+      </div>
+      <div class="form-row" style="margin-top:10px">
+        <button id="btnConnect" class="btn btn-primary">连接</button>
+        <button id="btnDisconnect" class="btn btn-secondary" disabled>断开</button>
+      </div>
+    </section>
+
+    <!-- 端口映射 -->
+    <section class="card">
+      <div class="card-title">
+        端口映射
+        <button id="btnAddMapping" class="btn btn-small btn-primary" disabled>+ 添加</button>
+      </div>
+      <div id="mappingList" class="mapping-list">
+        <div class="empty-hint">暂无映射，点击「添加」创建</div>
+      </div>
+    </section>
+
+    <!-- 日志 -->
+    <section class="card log-card">
+      <div class="card-title">日志</div>
+      <div id="logArea" class="log-area">
+        <div class="log-line">系统就绪，等待连接...</div>
+      </div>
+    </section>
+
+    <!-- 添加映射弹窗 -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-title">添加端口映射</div>
+        <div class="form-row">
+          <label>远程端口</label>
+          <input id="modalRemotePort" type="number" placeholder="例如 8080">
+        </div>
+        <div class="form-row">
+          <label>协议</label>
+          <select id="modalProtocol">
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>本地地址</label>
+          <input id="modalLocalHost" type="text" placeholder="127.0.0.1" value="127.0.0.1">
+        </div>
+        <div class="form-row">
+          <label>本地端口</label>
+          <input id="modalLocalPort" type="number" placeholder="例如 3000">
+        </div>
+        <div class="form-row" style="margin-top:16px; gap:8px">
+          <button id="btnModalConfirm" class="btn btn-primary">确认</button>
+          <button id="btnModalCancel" class="btn btn-secondary">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

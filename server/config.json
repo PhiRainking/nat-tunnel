@@ -1,0 +1,7 @@
+{
+  "controlPort": 7000,
+  "adminPort": 9000,
+  "adminToken": "admin123",
+  "authToken": "rainking-tunnel-2024",
+  "clientTimeout": 30000
+}

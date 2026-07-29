@@ -1,0 +1,13 @@
+{
+  "name": "nat-tunnel-server",
+  "version": "1.0.0",
+  "description": "内网穿透服务端 - 部署在 Ubuntu 上",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:bg": "nohup node server.js > server.log 2>&1 &"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NatTunnel - 内网穿透</title>
+<style>
+:root {
+  --bg: #fafafa;
+  --card: #fff;
+  --border: #e5e5e5;
+  --text: #1a1a1a;
+  --text2: #888;
+  --radius: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Microsoft YaHei', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 680px; margin: 0 auto; padding: 60px 24px; }
+
+.hero { text-align: center; margin-bottom: 48px; }
+.hero h1 { font-size: 32px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+.hero p  { color: var(--text2); font-size: 15px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card h2 .icon { font-size: 18px; }
+
+.step { margin-bottom: 16px; }
+.step:last-child { margin-bottom: 0; }
+.step .num {
+  display: inline-block;
+  width: 22px; height: 22px;
+  background: var(--text);
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.step p { color: var(--text2); font-size: 13px; margin-top: 4px; margin-left: 30px; }
+
+.code-block {
+  background: #f3f3f3;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 8px 0 4px 0;
+  position: relative;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: inherit;
+}
+.code-block .copy-btn:hover { color: var(--text); border-color: var(--text); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border: 1px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--text);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn:hover { background: #333; }
+.btn-outline {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { background: #f3f3f3; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+.note {
+  font-size: 12px;
+  color: var(--text2);
+  padding: 10px 14px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+footer {
+  text-align: center;
+  color: var(--text2);
+  font-size: 12px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <h1>NatTunnel</h1>
+    <p>简单、安全的内网穿透工具</p>
+  </div>
+
+  <!-- 服务端 -->
+  <div class="card">
+    <h2><span class="icon">🖥</span> 部署服务端（Ubuntu）</h2>
+    <div class="step">
+      <span class="num">1</span>SSH 登录服务器，执行以下命令：
+      <div class="code-block">
+        <button class="copy-btn" onclick="copy(this)">复制</button>
+curl -sSL https://8.134.147.15:8888/down/UymNPEIDwxve.sh | sudo bash
+      </div>
+      <p>脚本自动完成：安装 Node.js → 写入服务端代码 → 配置 systemd → 开放防火墙</p>
+    </div>
+    <div class="step">
+      <span class="num">2</span>安装完成后，浏览器打开管理面板配置：
+      <div class="code-block">
+http://你的服务器IP:9000
+      </div>
+      <p>默认管理密码: admin123 | 可在面板中在线修改令牌和密码</p>
+    </div>
+    <div class="note">自定义参数: <code>PORT=7000 TOKEN=*** ADMIN_PWD=*** sudo bash install.sh</code></div>
+  </div>
+
+  <!-- 客户端 -->
+  <div class="card">
+    <h2><span class="icon">💻</span> 下载客户端（Windows）</h2>
+    <div class="step">
+      <span class="num">1</span>下载安装包：
+      <div class="btn-row">
+        <a class="btn" href="https://8.134.147.15:8888/down/NatTunnel-Setup.exe" download>下载 Windows 安装包</a>
+        <span style="color:var(--text2);font-size:12px;align-self:center">NatTunnel-Setup.exe（约 115MB）</span>
+      </div>
+    </div>
+    <div class="step">
+      <span class="num">2</span>运行安装程序，按向导完成安装
+      <p>支持自定义安装目录、创建桌面快捷方式</p>
+    </div>
+    <div class="step">
+      <span class="num">3</span>打开 NatTunnel，填写连接信息：
+      <div class="code-block">
+服务器地址: 8.134.147.15
+端口:       7000
+认证令牌:   rainking-tunnel-2024
+      </div>
+      <p>点击「连接」后即可添加 TCP/UDP 端口映射</p>
+    </div>
+  </div>
+
+  <!-- 架构说明 -->
+  <div class="card">
+    <h2><span class="icon">🔗</span> 工作原理</h2>
+    <div style="text-align:center;color:var(--text2);font-size:13px;line-height:2">
+      外网访客 &rarr; <strong>服务器端口</strong> &rarr; 加密隧道 &rarr; <strong>你的电脑</strong> &rarr; <strong>本地服务</strong>
+    </div>
+    <div class="note" style="margin-top:16px">
+      支持 TCP 和 UDP 协议。客户端通过控制端口与服务器保持长连接，服务器收到外部请求后通过隧道转发到你的本地服务。
+    </div>
+  </div>
+
+  <footer>
+    NatTunnel &copy; 2024 RainKing &nbsp;|&nbsp; 仅供合法用途
+  </footer>
+</div>
+
+<script>
+function copy(btn) {
+  const block = btn.parentElement;
+  const text = block.textContent.replace('复制', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已复制';
+    setTimeout(() => btn.textContent = '复制', 1500);
+  });
+}
+</script>
+</body>
+</html>
